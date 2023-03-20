@@ -14,7 +14,7 @@ namespace ASP.NET_RazorPage.Pages
             _context = context;
         }
 
-        public Employee Employee { get; set; }
+        public Employee? Employee { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {

@@ -16,13 +16,13 @@ namespace ASP.NET_RazorPage.Pages
             _context = context;
         }
 
-        public IEnumerable<Employee> Employee { get; set; } = default!;
+        public IEnumerable<Employee>? Employee { get; set; } = default!;
 
-        public int TotalRecords { get; set; }
+        public int? TotalRecords { get; set; }
 
-        public int PageNo { get; set; }
+        public int? PageNo { get; set; }
 
-        public int PageSize { get; set; }
+        public int? PageSize { get; set; }
 
         [BindProperty(SupportsGet = true)]
         public string? SearchBox { get; set; }

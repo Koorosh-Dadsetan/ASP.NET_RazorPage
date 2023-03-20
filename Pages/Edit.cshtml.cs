@@ -15,7 +15,7 @@ namespace ASP.NET_RazorPage.Pages
         }
 
         [BindProperty]
-        public Employee Employee { get; set; } = default!;
+        public Employee? Employee { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {

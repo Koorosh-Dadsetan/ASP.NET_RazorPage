@@ -13,14 +13,13 @@ namespace ASP.NET_RazorPage.Pages
             _context = context;
         }
 
+        [BindProperty]
+        public Employee? Employee { get; set; }
+
         public IActionResult OnGet()
         {
             return Page();
         }
-
-        [BindProperty]
-        public Employee Employee { get; set; }
-
 
         public async Task<IActionResult> OnPostAsync()
         {

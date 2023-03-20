@@ -18,13 +18,13 @@ namespace ASP.NET_RazorPage.Pages
         public IEnumerable<DataRow>? Cultures { get; set; }
 
         [BindProperty]
-        public int TotalRecords { get; set; }
+        public int? TotalRecords { get; set; }
 
         [BindProperty]
-        public int PageNo { get; set; }
+        public int? PageNo { get; set; }
 
         [BindProperty]
-        public int PageSize { get; set; }
+        public int? PageSize { get; set; }
 
         [BindProperty(SupportsGet = true)]
         public string? SearchBox { get; set; }
