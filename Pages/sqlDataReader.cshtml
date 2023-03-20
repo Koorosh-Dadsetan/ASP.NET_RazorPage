@@ -1,0 +1,105 @@
+﻿@page
+@model ASP.NET_RazorPage.Pages.sqlDataReader
+@{
+    @addTagHelper *,LazZiya.TagHelpers
+
+    ViewData["Title"] = "SqlDataReader";
+
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            width: 100%;
+            box-shadow: 0 0 40px 0 rgba(0,0,0,.15);
+        }
+
+        th {
+            background-color: #6c7ae0;
+            color: #fff;
+        }
+
+        td, th {
+            border: 1px solid #dddddd;
+            text-align: center;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f6ff;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            direction: ltr !important;
+        }
+
+            .pagination a {
+                color: black;
+            }
+
+                .pagination a.active {
+                    background-color: dodgerblue;
+                    color: white;
+                }
+
+                .pagination a:hover:not(.active) {
+                    background-color: #ddd;
+                }
+    </style>
+
+
+    <h1 style="text-align:center">صفحه تست SqlDataReader</h1>
+    <br />
+
+    if (Model.TotalRecords > 0)
+    {
+        <table>
+            <tr>
+                <th style="padding:3px !important;">ردیف</th>
+                <th>نام و نام خانوادگی</th>
+                <th>موبایل</th>
+                <th style="padding:12px !important;">سن</th>
+                <th>آدرس</th>
+            </tr>
+            @foreach (DataRow row in Model.Cultures)
+            {
+                <tr>
+                    <td>@row["id"]</td>
+                    <td>@row["FullName"]</td>
+                    <td>@row["Mobile"]</td>
+                    <td>@row["Age"]</td>
+                    <td>@row["Address"]</td>
+                </tr>
+            }
+        </table>
+
+        <br />
+
+        if (Model.TotalRecords > Model.PageSize)
+        {
+            <paging total-records="Model.TotalRecords"
+        page-no="Model.PageNo"
+        page-size="Model.PageSize"
+        text-next=""
+        text-previous=""
+        sr-text-previous="&laquo;"
+        sr-text-next="&raquo;"
+        show-first-last="false"
+        show-page-size-nav="false"
+        max-displayed-pages="5"
+        class="pagination">
+            </paging>
+
+            <br />
+        }
+
+        <form method="post">
+            <input type="submit" value="ExportExcel" asp-page-handler="ExportExcel" />
+        </form>
+    }
+    else
+    {
+        <h1 style="text-align:center">!متاسفانه داده ای جهت نمایش یافت نشد</h1>
+    }
+
+}
