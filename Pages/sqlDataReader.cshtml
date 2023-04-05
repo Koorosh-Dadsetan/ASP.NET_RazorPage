@@ -1,83 +1,102 @@
 ﻿@page
 @model ASP.NET_RazorPage.Pages.sqlDataReader
 @{
-    @addTagHelper *,LazZiya.TagHelpers
-
     ViewData["Title"] = "SqlDataReader";
+}
+@addTagHelper *,LazZiya.TagHelpers
 
-    <style>
-        table {
-            font-family: arial, sans-serif;
-            width: 100%;
-            box-shadow: 0 0 40px 0 rgba(0,0,0,.15);
+<style>
+    table {
+        font-family: arial, sans-serif;
+        width: 100%;
+        box-shadow: 0 0 40px 0 rgba(0,0,0,.15);
+    }
+
+    thead {
+        background-color: #6c7ae0;
+        color: #fff;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: center;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f6ff;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        direction: ltr !important;
+    }
+
+        .pagination a {
+            color: black;
         }
 
-        th {
-            background-color: #6c7ae0;
-            color: #fff;
-        }
-
-        td, th {
-            border: 1px solid #dddddd;
-            text-align: center;
-            padding: 8px;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f8f6ff;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            direction: ltr !important;
-        }
-
-            .pagination a {
-                color: black;
+            .pagination a.active {
+                background-color: dodgerblue;
+                color: white;
             }
 
-                .pagination a.active {
-                    background-color: dodgerblue;
-                    color: white;
-                }
+            .pagination a:hover:not(.active) {
+                background-color: #ddd;
+            }
+</style>
 
-                .pagination a:hover:not(.active) {
-                    background-color: #ddd;
-                }
-    </style>
+<form>
+    <input asp-for="SearchBox" />
+    <input type="submit" value="جستوجو" />
+</form>
 
+<h1 class="text-center">SqlDataReader Page</h1>
 
-    <h1 style="text-align:center">صفحه تست SqlDataReader</h1>
+<a class="btn btn-light btn-outline-dark" asp-page="CreateBySqlDataAdapter">افزودن</a>
+
+@if (Model.TotalRecords > 0)
+{
+    <form class="d-inline" method="post">
+        <input class="btn btn-light btn-outline-dark" type="submit" value="دانلود فایل Excel" asp-page-handler="ExportExcel" />
+        <input class="btn btn-light btn-outline-dark" type="submit" value="دانلود فایل PDF" asp-page-handler="ExportPDF" />
+    </form>
+    <br />
     <br />
 
-    if (Model.TotalRecords > 0)
-    {
-        <table>
+    <table>
+        <thead>
             <tr>
-                <th style="padding:3px !important;">ردیف</th>
                 <th>نام و نام خانوادگی</th>
                 <th>موبایل</th>
-                <th style="padding:12px !important;">سن</th>
+                <th>سن</th>
                 <th>آدرس</th>
+                <th></th>
             </tr>
-            @foreach (DataRow row in Model.Cultures)
+        </thead>
+        <tbody>
+            @foreach (DataRow item in Model.Cultures)
             {
                 <tr>
-                    <td>@row["id"]</td>
-                    <td>@row["FullName"]</td>
-                    <td>@row["Mobile"]</td>
-                    <td>@row["Age"]</td>
-                    <td>@row["Address"]</td>
+                    <td>@item["FullName"]</td>
+                    <td>@item["Mobile"]</td>
+                    <td>@item["Age"]</td>
+                    <td>@item["Address"]</td>
+                    <td>
+                        <a class="btn btn-info" asp-page="./DetailsBySqlDataAdapter" asp-route-id="@item["id"]">جزئیات</a>
+                        <a class="btn btn-warning" asp-page="./EditBySqlDataAdapter" asp-route-id="@item["id"]">ویرایش</a>
+                        <a class="btn btn-danger" asp-page="./DeleteBySqlDataAdapter" asp-route-id="@item["id"]">حذف</a>
+                    </td>
                 </tr>
             }
-        </table>
+        </tbody>
+    </table>
+    <br />
 
-        <br />
-
-        if (Model.TotalRecords > Model.PageSize)
-        {
-            <paging total-records="Model.TotalRecords"
+    if (Model.TotalRecords > Model.PageSize)
+    {
+        <paging total-records="Model.TotalRecords"
         page-no="Model.PageNo"
         page-size="Model.PageSize"
         text-next=""
@@ -88,18 +107,10 @@
         show-page-size-nav="false"
         max-displayed-pages="5"
         class="pagination">
-            </paging>
-
-            <br />
-        }
-
-        <form method="post">
-            <input type="submit" value="ExportExcel" asp-page-handler="ExportExcel" />
-        </form>
+        </paging>
     }
-    else
-    {
-        <h1 style="text-align:center">!متاسفانه داده ای جهت نمایش یافت نشد</h1>
-    }
-
+}
+else
+{
+    <h1 style="text-align:center">متاسفانه داده ای جهت نمایش یافت نشد!</h1>
 }

@@ -8,6 +8,27 @@
 @addTagHelper *,LazZiya.TagHelpers
 
 <style>
+    table {
+        font-family: arial, sans-serif;
+        width: 100%;
+        box-shadow: 0 0 40px 0 rgba(0,0,0,.15);
+    }
+
+    thead {
+        background-color: #6c7ae0;
+        color: #fff;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: center;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f6ff;
+    }
+
     .pagination {
         display: flex;
         justify-content: center;
@@ -33,66 +54,67 @@
     <input type="submit" value="جستوجو" />
 </form>
 
-<h1>EFCore</h1>
+<h1 class="text-center">EF Core Page</h1>
 
-<p>
-    <a asp-page="Create">افزودن</a>
-</p>
+<a class="btn btn-light btn-outline-dark" asp-page="Create">افزودن</a>
 
-<form method="post">
-    <input type="submit" value="دانلود فایل Excel" asp-page-handler="ExportExcel" />
-    <input type="submit" value="دانلود فایل PDF" asp-page-handler="ExportPDF" />
-</form>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                نام و نام خانوادگی
-            </th>
-            <th>
-                موبایل
-            </th>
-            <th>
-                سن
-            </th>
-            <th>
-                آدرس
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Employee)
-        {
-            <tr>
-                <td>
-                    @item.FullName
-                </td>
-                <td>
-                    @item.Mobile
-                </td>
-                <td>
-                    @item.Age
-                </td>
-                <td>
-                    @item.Address
-                </td>
-                <td>
-                    <a asp-page="./Edit" asp-route-id="@item.Id">ویرایش</a> |
-                    <a asp-page="./Details" asp-route-id="@item.Id">جزئیات</a> |
-                    <a asp-page="./Delete" asp-route-id="@item.Id">حذف</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
-
-<br />
-
-@if (Model.TotalRecords > Model.PageSize)
+@if (Model.TotalRecords > 0)
 {
-    <paging total-records="Model.TotalRecords"
+    <form class="d-inline" method="post">
+        <input class="btn btn-light btn-outline-dark" type="submit" value="دانلود فایل Excel" asp-page-handler="ExportExcel" />
+        <input class="btn btn-light btn-outline-dark" type="submit" value="دانلود فایل PDF" asp-page-handler="ExportPDF" />
+    </form>
+    <br />
+    <br />
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    نام و نام خانوادگی
+                </th>
+                <th>
+                    موبایل
+                </th>
+                <th>
+                    سن
+                </th>
+                <th>
+                    آدرس
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Employee)
+            {
+                <tr>
+                    <td>
+                        @item.FullName
+                    </td>
+                    <td>
+                        @item.Mobile
+                    </td>
+                    <td>
+                        @item.Age
+                    </td>
+                    <td>
+                        @item.Address
+                    </td>
+                    <td>
+                        <a class="btn btn-info" asp-page="./Details" asp-route-id="@item.Id">جزئیات</a>
+                        <a class="btn btn-warning" asp-page="./Edit" asp-route-id="@item.Id">ویرایش</a>
+                        <a class="btn btn-danger" asp-page="./Delete" asp-route-id="@item.Id">حذف</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <br />
+
+    @if (Model.TotalRecords > Model.PageSize)
+    {
+        <paging total-records="Model.TotalRecords"
         page-no="Model.PageNo"
         page-size="Model.PageSize"
         text-next=""
@@ -103,5 +125,10 @@
         show-page-size-nav="false"
         max-displayed-pages="5"
         class="pagination">
-    </paging>
+        </paging>
+    }
+}
+else
+{
+    <h1 class="text-center">متاسفانه داده ای جهت نمایش یافت نشد!</h1>
 }

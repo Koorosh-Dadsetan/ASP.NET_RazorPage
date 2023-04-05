@@ -1,133 +1,102 @@
 ﻿@page
 @model ASP.NET_RazorPage.Pages.sqlDataAdapter
 @{
-    @addTagHelper *,LazZiya.TagHelpers
-
     ViewData["Title"] = "SqlDataAdapter";
+}
+@addTagHelper *,LazZiya.TagHelpers
 
-    <style>
-        table {
-            font-family: arial, sans-serif;
-            width: 100%;
-            box-shadow: 0 0 40px 0 rgba(0,0,0,.15);
+<style>
+    table {
+        font-family: arial, sans-serif;
+        width: 100%;
+        box-shadow: 0 0 40px 0 rgba(0,0,0,.15);
+    }
+
+    thead {
+        background-color: #6c7ae0;
+        color: #fff;
+    }
+
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: center;
+        padding: 8px;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f8f6ff;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: center;
+        direction: ltr !important;
+    }
+
+        .pagination a {
+            color: black;
         }
 
-        th {
-            background-color: #6c7ae0;
-            color: #fff;
-        }
-
-        td, th {
-            border: 1px solid #dddddd;
-            text-align: center;
-            padding: 8px;
-        }
-
-        tr:nth-child(even) {
-            background-color: #f8f6ff;
-        }
-
-        .pagination {
-            display: flex;
-            justify-content: center;
-            direction: ltr !important;
-        }
-
-            .pagination a {
-                color: black;
+            .pagination a.active {
+                background-color: dodgerblue;
+                color: white;
             }
 
-                .pagination a.active {
-                    background-color: dodgerblue;
-                    color: white;
-                }
+            .pagination a:hover:not(.active) {
+                background-color: #ddd;
+            }
+</style>
 
-                .pagination a:hover:not(.active) {
-                    background-color: #ddd;
-                }
-    </style>
+<form>
+    <input asp-for="SearchBox" />
+    <input type="submit" value="جستوجو" />
+</form>
 
-    <form>
-        <input asp-for="SearchBox" />
-        <input type="submit" value="جستوجو" />
+<h1 class="text-center">SqlDataAdapter Page</h1>
+
+<a class="btn btn-light btn-outline-dark" asp-page="CreateBySqlDataAdapter">افزودن</a>
+
+@if (Model.TotalRecords > 0)
+{
+    <form class="d-inline" method="post">
+        <input class="btn btn-light btn-outline-dark" type="submit" value="دانلود فایل Excel" asp-page-handler="ExportExcel" />
+        <input class="btn btn-light btn-outline-dark" type="submit" value="دانلود فایل PDF" asp-page-handler="ExportPDF" />
     </form>
-
-    <h1 style="text-align:center">صفحه تست SqlDataAdapter</h1>
+    <br />
     <br />
 
-    if (Model.TotalRecords > 0)
-    {
-        <form method="post">
-            <input type="submit" value="دانلود فایل Excel" asp-page-handler="ExportExcel" />
-            <input type="submit" value="دانلود فایل PDF" asp-page-handler="ExportPDF" />
-        </form>
-        <br />
-
-        if (TempData["EditButton"] != null)
-        {
-            <div style="display:flex; justify-content:center; position:absolute; z-index:1;">
-                <form method="post" style="width:80%; border:1px solid black; background:#f8f6ff;">
-                    <label style="width:45%; margin:2%;">نام و نام خانوادگی: <input style="width:100%;" type="text" asp-for="EditFullname" value="@TempData["EditFullname"]" /></label>
-                    <span asp-validation-for="EditFullname"></span>
-                    <label style="width:45%; margin:2%;">موبایل: <input style="width:100%;" type="text" asp-for="EditMobile" value="@TempData["EditMobile"]" /></label>
-                    <span asp-validation-for="EditMobile"></span>
-                    <label style="width:45%; margin:2%;">سن: <input style="width:100%;" type="number" asp-for="EditAge" value="@TempData["EditAge"]" /></label>
-                    <span asp-validation-for="EditAge"></span>
-                    <label style="width:45%; margin:2%;">آدرس: <input style="width:100%;" type="text" asp-for="EditAddress" value="@TempData["EditAddress"]" /></label>
-                    <span asp-validation-for="EditAddress"></span>
-
-                    <input class="btn btn-primary" type="submit" value="ذخیره" asp-page-handler="EditSubmit" asp-route-EditId="@TempData["EditId"]" />
-
-                    <a class="btn btn-secondary" asp-page-handler="Cancel">انصراف</a>
-                </form>
-            </div>
-        }
-
-        if (TempData["DeleteButton"] != null)
-        {
-            <div style="display:flex; justify-content:center; position:absolute; z-index:1;">
-                <form method="post" style="width:80%; border:1px solid black; background:#f8f6ff;">
-                    <h5 style="width:95%; margin:2%;">آیا از حذف @TempData["DeleteFullName"] مطمئن هستید؟</h5>
-
-                    <input type="submit" value="حذف" asp-page-handler="DeleteSubmit" asp-route-DeleteId="@TempData["DeleteId"]" />
-
-                    <input type="submit" value="انصراف" asp-page-handler="Cancel" />
-                </form>
-            </div>
-        }
-
-        <table>
+    <table>
+        <thead>
             <tr>
-                <th style="padding:3px !important;">ردیف</th>
                 <th>نام و نام خانوادگی</th>
                 <th>موبایل</th>
-                <th style="padding:12px !important;">سن</th>
+                <th>سن</th>
                 <th>آدرس</th>
                 <th></th>
             </tr>
-            @foreach (DataRow row in Model.Cultures)
+        </thead>
+        <tbody>
+            @foreach (DataRow item in Model.Cultures)
             {
                 <tr>
-                    <td>@row["ردیف"]</td>
-                    <td>@row["نام و نام خانوادگی"]</td>
-                    <td>@row["موبایل"]</td>
-                    <td>@row["سن"]</td>
-                    <td>@row["آدرس"]</td>
+                    <td>@item["FullName"]</td>
+                    <td>@item["Mobile"]</td>
+                    <td>@item["Age"]</td>
+                    <td>@item["Address"]</td>
                     <td>
-                        <form method="post">
-                            <input type="submit" value="ویرایش" asp-page-handler="Edit" asp-route-EditId="@row["ردیف"]" asp-route-EditFullname="@row["نام و نام خانوادگی"]" asp-route-EditMobile="@row["موبایل"]" asp-route-EditAge="@row["سن"]" asp-route-EditAddress="@row["آدرس"]" />
-                            <input type="submit" value="حذف" asp-page-handler="Delete" asp-route-DeleteId="@row["ردیف"]" asp-route-DeleteFullName="@row["نام و نام خانوادگی"]" />
-                        </form>
+                        <a class="btn btn-info" asp-page="./DetailsBySqlDataAdapter" asp-route-id="@item["id"]">جزئیات</a>
+                        <a class="btn btn-warning" asp-page="./EditBySqlDataAdapter" asp-route-id="@item["id"]">ویرایش</a>
+                        <a class="btn btn-danger" asp-page="./DeleteBySqlDataAdapter" asp-route-id="@item["id"]">حذف</a>
                     </td>
                 </tr>
             }
-        </table>
+        </tbody>
+    </table>
+    <br />
 
-        <br />
-
-        if (Model.TotalRecords > Model.PageSize)
-        {
-            <paging total-records="Model.TotalRecords"
+    if (Model.TotalRecords > Model.PageSize)
+    {
+        <paging total-records="Model.TotalRecords"
         page-no="Model.PageNo"
         page-size="Model.PageSize"
         text-next=""
@@ -138,19 +107,10 @@
         show-page-size-nav="false"
         max-displayed-pages="5"
         class="pagination">
-            </paging>
-        }
+        </paging>
     }
-    else
-    {
-        <h1 style="text-align:center">!متاسفانه داده ای جهت نمایش یافت نشد</h1>
-    }
-
-    @section Scripts {
-        @{
-            await Html.RenderPartialAsync("_ValidationScriptsPartial");
-        }
-    }
-
-
+}
+else
+{
+    <h1 style="text-align:center">متاسفانه داده ای جهت نمایش یافت نشد!</h1>
 }

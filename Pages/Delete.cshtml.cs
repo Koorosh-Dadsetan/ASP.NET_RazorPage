@@ -53,12 +53,5 @@ namespace ASP.NET_RazorPage.Pages
 
             return RedirectToPage("/EFCore");
         }
-
-        public IActionResult OnPostCancel()
-        {
-            return RedirectToPage("/EFCore");
-        }
-
-
     }
 }

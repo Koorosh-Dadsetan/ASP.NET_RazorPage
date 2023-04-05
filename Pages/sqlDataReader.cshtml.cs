@@ -12,49 +12,88 @@ namespace ASP.NET_RazorPage.Pages
                 "Data Source=DESKTOP-90OC7A4\\SQLEXPRESS;Initial Catalog=Test_db;Integrated Security=true";
 
         private string queryString =
-            "SELECT [id] ,[FullName] ,[Mobile] ,[Age] ,[Address] FROM [Test_db].[dbo].[Employees]";
+            "SELECT [id], [FullName], [Mobile], [Age], [Address] FROM [Test_db].[dbo].[Employees]";
 
         public IEnumerable<DataRow>? Cultures { get; set; }
 
-        public int? TotalRecords { get; set; }
+        public int TotalRecords { get; set; }
 
-        public int? PageNo { get; set; }
+        public int PageNo { get; set; }
 
-        public int? PageSize { get; set; }
+        public int PageSize { get; set; }
 
+        [BindProperty(SupportsGet = true)]
+        public string? SearchBox { get; set; }
 
         public void OnGet(int p = 1, int s = 5)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            if (string.IsNullOrEmpty(SearchBox))
             {
-                SqlCommand command = new SqlCommand(queryString, connection);
-
-                try
+                using (SqlConnection connection = new SqlConnection(connectionString))
                 {
-                    connection.Open();
-                    SqlDataReader reader = command.ExecuteReader();
+                    SqlCommand command = new SqlCommand(queryString, connection);
+                    try
+                    {
+                        connection.Open();
+                        SqlDataReader reader = command.ExecuteReader();
 
-                    dataTable.Load(reader);
+                        dataTable.Load(reader);
 
-                    reader.Close();
+                        reader.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception(ex.Message);
+                    }
                 }
-                catch (Exception ex)
-                {
-                    throw new Exception(ex.Message);
-                }
+
+                var results = from myRow in dataTable.AsEnumerable()
+                              select myRow;
+
+                Cultures = results
+                    .Skip((p - 1) * s).Take(s);
+
+                TotalRecords = results.Count();
+
+                PageNo = p;
+
+                PageSize = s;
             }
+            else if (SearchBox != null)
+            {
+                queryString =
+            "SELECT id, FullName, Mobile, Age, Address FROM [Test_db].[dbo].[Employees] WHERE FullName LIKE N'%" + SearchBox + "%'";
 
-            var results = from myRow in dataTable.AsEnumerable()
-                          select myRow;
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    SqlCommand command = new SqlCommand(queryString, connection);
+                    try
+                    {
+                        connection.Open();
+                        SqlDataReader reader = command.ExecuteReader();
 
-            Cultures = results
-                .Skip((p - 1) * s).Take(s);
+                        dataTable.Load(reader);
 
-            TotalRecords = results.Count();
+                        reader.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception(ex.Message);
+                    }
+                }
 
-            PageNo = p;
+                var results = from myRow in dataTable.AsEnumerable()
+                              select myRow;
 
-            PageSize = s;
+                Cultures = results
+                    .Skip((p - 1) * s).Take(s);
+
+                TotalRecords = results.Count();
+
+                PageNo = p;
+
+                PageSize = s;
+            }
         }
 
         public FileResult OnPostExportExcel()
@@ -99,6 +138,49 @@ namespace ASP.NET_RazorPage.Pages
                     wb.SaveAs(stream);
                     return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Employees.xlsx");
                 }
+            }
+        }
+
+        public FileResult OnPostExportPDF()
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                SqlCommand cmd = new SqlCommand(queryString, conn);
+                try
+                {
+                    conn.Open();
+
+                    SqlDataAdapter da = new SqlDataAdapter(cmd);
+                    da.Fill(dataTable);
+
+                    conn.Close();
+                    da.Dispose();
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.Message);
+                }
+            }
+
+            //string htmlString = "<html><body><h1>Koorosh Dadsetan</h1></body></html>";
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                SelectPdf.HtmlToPdf converter = new SelectPdf.HtmlToPdf();
+
+                converter.Options.PdfPageSize = SelectPdf.PdfPageSize.A4;
+                converter.Options.PdfPageOrientation = SelectPdf.PdfPageOrientation.Landscape;
+                converter.Options.AutoFitWidth = SelectPdf.HtmlToPdfPageFitMode.AutoFit;
+                converter.Options.AutoFitHeight = SelectPdf.HtmlToPdfPageFitMode.AutoFit;
+
+                //SelectPdf.PdfDocument doc = converter.ConvertHtmlString(htmlString);
+
+                SelectPdf.PdfDocument doc = converter.ConvertUrl("https://localhost:7093/sqldataadapter");
+
+                doc.Save(stream);
+                doc.Close();
+
+                return File(stream.ToArray(), "application/pdf", "Employees.pdf");
             }
         }
 
